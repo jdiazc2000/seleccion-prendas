@@ -181,10 +181,8 @@ export class UploadClothingPageComponent implements OnDestroy {
       const transparentPng = await removeBackground(file, {
         model: 'isnet_quint8',
         output: { format: 'image/png', quality: 1 },
-        progress: (_key, current, total) => {
-          if (selectionId !== this.imageSelectionId || total <= 0) return;
-          const percent = Math.min(100, Math.round((current / total) * 100));
-          this.processingMessage.set(`Descargando modelo: ${percent}%`);
+        progress: () => {
+          this.processingMessage.set(`Descargando modelo...`);
         },
       });
 
