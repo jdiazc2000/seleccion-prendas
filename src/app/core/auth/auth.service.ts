@@ -36,6 +36,9 @@ export class AuthService {
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: 'https://closetappjd.netlify.app/login',
+      },
     });
 
     if (error) {
