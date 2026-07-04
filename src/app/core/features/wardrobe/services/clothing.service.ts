@@ -51,14 +51,14 @@ export class ClothingService {
     imageUrl: string;
   }> {
     const userId = this.authService.getUserId();
-    const fileExtension = file.name.split('.').pop() || 'jpg';
-    const fileName = `${crypto.randomUUID()}.${fileExtension}`;
+    const fileName = `${crypto.randomUUID()}.png`;
     const imagePath = `${userId}/${fileName}`;
 
     const { error } = await supabase.storage
       .from(this.bucketName)
       .upload(imagePath, file, {
         cacheControl: '3600',
+        contentType: 'image/png',
         upsert: false,
       });
 

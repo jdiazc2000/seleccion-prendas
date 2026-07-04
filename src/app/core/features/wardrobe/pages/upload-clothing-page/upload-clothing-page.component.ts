@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ClothingCategory, CATEGORY_LABEL } from '../../models/clothing.model';
@@ -77,6 +77,7 @@ import { ClothingService } from '../../services/clothing.service';
               accept="image/*"
               name="file"
               (change)="onFileSelected($event)"
+              [disabled]="processingImage()"
               required
             />
             <label class="photo-picker" for="clothing-photo">
@@ -84,15 +85,15 @@ import { ClothingService } from '../../services/clothing.service';
                 upload
               </span></span>
               <span class="photo-copy">
-                <strong>{{ selectedFile ? 'Cambiar foto' : 'Seleccionar foto' }}</strong>
-                <small>{{ selectedFile?.name || 'PNG, JPG o WEBP' }}</small>
+                <strong>{{ processingImage() ? 'Quitando fondo...' : selectedFile ? 'Cambiar foto' : 'Seleccionar foto' }}</strong>
+                <small>{{ processingMessage() || selectedFile?.name || 'PNG, JPG o WEBP' }}</small>
               </span>
               <span class="photo-action">Explorar</span>
             </label>
           </div>
 
-          <button class="btn btn-primary" type="submit" [disabled]="loading()">
-            {{ loading() ? 'Subiendo...' : 'Guardar prenda' }}
+          <button class="btn btn-primary" type="submit" [disabled]="loading() || processingImage()">
+            {{ processingImage() ? 'Procesando imagen...' : loading() ? 'Subiendo...' : 'Guardar prenda' }}
           </button>
 
           <a class="btn btn-secondary" routerLink="/wardrobe">Volver al combinador</a>
@@ -132,7 +133,7 @@ import { ClothingService } from '../../services/clothing.service';
     </div>
   `,
 })
-export class UploadClothingPageComponent {
+export class UploadClothingPageComponent implements OnDestroy {
   readonly clothingService = inject(ClothingService);
   readonly labels = CATEGORY_LABEL;
 
@@ -144,16 +145,73 @@ export class UploadClothingPageComponent {
 
   selectedFile: File | null = null;
   previewUrl = signal<string | null>(null);
+  processingImage = signal(false);
+  processingMessage = signal<string | null>(null);
   loading = signal(false);
   success = signal<string | null>(null);
   error = signal<string | null>(null);
 
-  onFileSelected(event: Event): void {
+  private imageSelectionId = 0;
+
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
+    const selectionId = ++this.imageSelectionId;
 
-    this.selectedFile = file;
-    this.previewUrl.set(file ? URL.createObjectURL(file) : null);
+    this.error.set(null);
+    this.success.set(null);
+
+    if (!file) {
+      this.replacePreview(null);
+      this.selectedFile = null;
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.error.set('Selecciona un archivo de imagen válido.');
+      input.value = '';
+      return;
+    }
+
+    this.processingImage.set(true);
+    this.processingMessage.set('Preparando el recorte automático...');
+
+    try {
+      const { removeBackground } = await import('@imgly/background-removal');
+      const transparentPng = await removeBackground(file, {
+        model: 'isnet_quint8',
+        output: { format: 'image/png', quality: 1 },
+        progress: (_key, current, total) => {
+          if (selectionId !== this.imageSelectionId || total <= 0) return;
+          const percent = Math.min(100, Math.round((current / total) * 100));
+          this.processingMessage.set(`Descargando modelo: ${percent}%`);
+        },
+      });
+
+      if (selectionId !== this.imageSelectionId) return;
+
+      const baseName = file.name.replace(/\.[^.]+$/, '') || 'prenda';
+      this.selectedFile = new File([transparentPng], `${baseName}-sin-fondo.png`, {
+        type: 'image/png',
+      });
+      this.replacePreview(URL.createObjectURL(transparentPng));
+      this.processingMessage.set('Fondo eliminado · PNG transparente');
+    } catch (error) {
+      if (selectionId !== this.imageSelectionId) return;
+      this.selectedFile = null;
+      this.replacePreview(null);
+      input.value = '';
+      this.error.set(
+        error instanceof Error
+          ? `No se pudo quitar el fondo: ${error.message}`
+          : 'No se pudo quitar el fondo de la imagen.',
+      );
+      this.processingMessage.set(null);
+    } finally {
+      if (selectionId === this.imageSelectionId) {
+        this.processingImage.set(false);
+      }
+    }
   }
 
   toggleStyle(style: string): void {
@@ -207,6 +265,18 @@ export class UploadClothingPageComponent {
     this.color = '';
     this.selectedStyles.clear();
     this.selectedFile = null;
-    this.previewUrl.set(null);
+    this.processingMessage.set(null);
+    this.replacePreview(null);
+  }
+
+  ngOnDestroy(): void {
+    this.imageSelectionId++;
+    this.replacePreview(null);
+  }
+
+  private replacePreview(url: string | null): void {
+    const currentUrl = this.previewUrl();
+    if (currentUrl) URL.revokeObjectURL(currentUrl);
+    this.previewUrl.set(url);
   }
 }
