@@ -1,0 +1,57 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+}
+
+.wardrobe-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 24px;
+}
+
+.carousel-list {
+  display: grid;
+  overflow: hidden;
+}
+
+.carousel-list app-clothing-carousel + app-clothing-carousel {
+  border-top: 1px solid rgba(214, 79, 117, 0.14);
+}
+
+.side-panel {
+  position: sticky;
+  top: 102px;
+  display: grid;
+  gap: 18px;
+}
+
+.actions {
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+}
+
+.outfit-name {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .wardrobe-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

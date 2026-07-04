@@ -1,0 +1,94 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+}
+
+.empty-state.big {
+  min-height: 280px;
+  align-content: center;
+  gap: 12px;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.favorite-card {
+  padding: 22px;
+}
+
+.favorite-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.delete-btn {
+  border-radius: 999px;
+  padding: 9px 12px;
+  color: #9c2f53;
+  background: #ffe4ec;
+  font-weight: 900;
+}
+
+.delete-btn:hover {
+  background: #ffd2df;
+}
+
+.favorite-images {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.mini-slot {
+  min-height: 170px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  border: 1px dashed #e9bdcc;
+  border-radius: 18px;
+  padding: 10px;
+  background: white;
+  color: #806673;
+  text-align: center;
+}
+
+.mini-slot img {
+  width: 100%;
+  height: 110px;
+  object-fit: contain;
+}
+
+.mini-slot strong {
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .favorite-header {
+    flex-direction: column;
+  }
+
+  .mini-slot {
+    min-height: 140px;
+  }
+}

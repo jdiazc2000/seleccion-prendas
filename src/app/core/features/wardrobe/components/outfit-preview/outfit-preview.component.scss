@@ -1,0 +1,42 @@
+.preview {
+  padding: 22px;
+}
+
+.outfit-stack {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.slot {
+  min-height: 142px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px dashed #e9bdcc;
+  background: #fff;
+  color: #806673;
+  text-align: center;
+  padding: 10px;
+}
+
+.slot img {
+  width: 100%;
+  max-height: 110px;
+  object-fit: contain;
+}
+
+.slot strong {
+  color: #2d1822;
+  font-size: 13px;
+}
+
+.slot.shoes {
+  min-height: 118px;
+}
+
+.slot.shoes img {
+  max-height: 84px;
+}

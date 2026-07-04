@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.carousel {
+  padding: 22px;
+}
+
+.section-header.compact {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.counter {
+  height: fit-content;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #9c2f53;
+  background: #ffe4ec;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.carousel-body {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 14px;
+}
+
+.arrow {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #9c2f53;
+  font-size: 32px;
+  line-height: 1;
+  background: #ffe4ec;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.arrow:hover {
+  transform: scale(1.06);
+  background: #ffd2df;
+}
+
+.clothing-item {
+  min-width: 0;
+  text-align: center;
+}
+
+.image-shell {
+  position: relative;
+  height: 260px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid #f3d5df;
+  background: #fff;
+}
+
+.image-shell img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+  object-position: center;
+}
+
+.item-info {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.item-info h3 {
+  margin-bottom: 0;
+}
+
+@media (max-width: 680px) {
+  .carousel-body {
+    grid-template-columns: 38px 1fr 38px;
+    gap: 10px;
+  }
+
+  .arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 28px;
+  }
+
+  .image-shell {
+    height: 220px;
+  }
+}
