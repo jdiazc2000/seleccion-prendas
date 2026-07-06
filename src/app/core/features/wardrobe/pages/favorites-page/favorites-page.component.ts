@@ -59,7 +59,6 @@ interface OutfitView {
               <div class="mini-slot">
                 @if (view.top) {
                   <img [src]="view.top.image_url" [alt]="view.top.name" />
-                  <strong>{{ view.top.name }}</strong>
                 } @else {
                   <span>Superior</span>
                 }
@@ -68,7 +67,6 @@ interface OutfitView {
               <div class="mini-slot">
                 @if (view.bottom) {
                   <img [src]="view.bottom.image_url" [alt]="view.bottom.name" />
-                  <strong>{{ view.bottom.name }}</strong>
                 } @else {
                   <span>Inferior</span>
                 }
@@ -77,7 +75,6 @@ interface OutfitView {
               <div class="mini-slot">
                 @if (view.shoes) {
                   <img [src]="view.shoes.image_url" [alt]="view.shoes.name" />
-                  <strong>{{ view.shoes.name }}</strong>
                 } @else {
                   <span>Zapatos</span>
                 }

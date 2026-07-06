@@ -4,22 +4,20 @@
 
 .outfit-stack {
   display: grid;
-  gap: 12px;
   margin-top: 18px;
-}
-
-.slot {
-  min-height: 142px;
-  display: grid;
-  place-items: center;
-  gap: 8px;
   overflow: hidden;
   border-radius: 22px;
   border: 1px dashed #e9bdcc;
   background: #fff;
+  padding: 10px;
+}
+
+.slot {
+  min-height: 130px;
+  display: grid;
+  place-items: center;
   color: #806673;
   text-align: center;
-  padding: 10px;
 }
 
 .slot img {
@@ -28,13 +26,8 @@
   object-fit: contain;
 }
 
-.slot strong {
-  color: #2d1822;
-  font-size: 13px;
-}
-
 .slot.shoes {
-  min-height: 118px;
+  min-height: 100px;
 }
 
 .slot.shoes img {

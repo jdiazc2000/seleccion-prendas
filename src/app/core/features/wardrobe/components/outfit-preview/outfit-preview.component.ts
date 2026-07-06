@@ -14,7 +14,6 @@ import { ClothingItem } from '../../models/clothing.model';
         <div class="slot">
           @if (top) {
             <img [src]="top.image_url" [alt]="top.name" />
-            <strong>{{ top.name }}</strong>
           } @else {
             <span>Parte superior</span>
           }
@@ -23,7 +22,6 @@ import { ClothingItem } from '../../models/clothing.model';
         <div class="slot">
           @if (bottom) {
             <img [src]="bottom.image_url" [alt]="bottom.name" />
-            <strong>{{ bottom.name }}</strong>
           } @else {
             <span>Parte inferior</span>
           }
@@ -32,7 +30,6 @@ import { ClothingItem } from '../../models/clothing.model';
         <div class="slot shoes">
           @if (shoes) {
             <img [src]="shoes.image_url" [alt]="shoes.name" />
-            <strong>{{ shoes.name }}</strong>
           } @else {
             <span>Zapatos</span>
           }
