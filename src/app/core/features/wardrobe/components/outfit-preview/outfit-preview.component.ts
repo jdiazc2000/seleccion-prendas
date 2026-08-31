@@ -15,7 +15,7 @@ import { ClothingItem } from '../../models/clothing.model';
           @if (top) {
             <img [src]="top.image_url" [alt]="top.name" />
           } @else {
-            <span>Parte superior</span>
+            
           }
         </div>
 
@@ -23,7 +23,7 @@ import { ClothingItem } from '../../models/clothing.model';
           @if (bottom) {
             <img [src]="bottom.image_url" [alt]="bottom.name" />
           } @else {
-            <span>Parte inferior</span>
+
           }
         </div>
 
@@ -31,7 +31,7 @@ import { ClothingItem } from '../../models/clothing.model';
           @if (shoes) {
             <img [src]="shoes.image_url" [alt]="shoes.name" />
           } @else {
-            <span>Zapatos</span>
+
           }
         </div>
       </div>

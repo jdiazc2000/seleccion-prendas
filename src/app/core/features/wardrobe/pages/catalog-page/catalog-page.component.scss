@@ -1,0 +1,151 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+}
+
+.filters {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-chip {
+  min-height: 40px;
+  border: 1px solid #f0ccd8;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #9c2f53;
+  background: white;
+  font-weight: 800;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.category-chip:hover {
+  border-color: #d64f75;
+  background: #fff7f9;
+}
+
+.category-chip.selected {
+  border-color: #d64f75;
+  color: white;
+  background: #d64f75;
+}
+
+.select-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.select-filters label {
+  display: grid;
+  gap: 8px;
+  color: #5c3c4b;
+  font-weight: 900;
+}
+
+.empty-state.big {
+  min-height: 220px;
+  align-content: center;
+  gap: 12px;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.catalog-card {
+  padding: 18px;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.edit-btn,
+.delete-btn {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.edit-btn {
+  color: #9c2f53;
+  background: white;
+  border: 1px solid #f0ccd8;
+}
+
+.edit-btn:hover {
+  border-color: #d64f75;
+}
+
+.delete-btn {
+  color: #9c2f53;
+  background: #ffe4ec;
+}
+
+.delete-btn:hover {
+  background: #ffd2df;
+}
+
+.image-shell {
+  position: relative;
+  height: 200px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid #f3d5df;
+  background: #fff;
+}
+
+.image-shell img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+  object-position: center;
+}
+
+.item-info {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.item-info h3 {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .select-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

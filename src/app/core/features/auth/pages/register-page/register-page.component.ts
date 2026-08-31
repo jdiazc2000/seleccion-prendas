@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../../../shared/services/auth.service';
+import { AuthService } from '../../../../auth/auth.service';
 
 @Component({
   selector: 'app-register-page',
@@ -13,7 +13,7 @@ import { AuthService } from '../../../../../shared/services/auth.service';
       <div class="auth-card card">
         <p class="eyebrow">Crear cuenta</p>
         <h1>Arma tu closet digital</h1>
-        <p class="muted">Crea una cuenta para guardar prendas, outfits y favoritos.</p>
+        <p class="muted">Crea una cuenta para guardar prendas, outfits y Outfits.</p>
 
         <form class="form" (ngSubmit)="register()">
           <label>

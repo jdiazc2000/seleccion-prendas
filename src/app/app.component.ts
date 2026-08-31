@@ -17,9 +17,10 @@ import { AuthService } from './core/auth/auth.service';
 
         @if (authService.user()) {
           <nav class="nav">
-            <a routerLink="/wardrobe" routerLinkActive="active">Combinar</a>
             <a routerLink="/upload" routerLinkActive="active">Subir prenda</a>
-            <a routerLink="/favorites" routerLinkActive="active">Favoritos</a>
+            <a routerLink="/catalog" routerLinkActive="active">Catálogo</a>
+            <a routerLink="/wardrobe" routerLinkActive="active">Combinar</a>
+            <a routerLink="/outfits" routerLinkActive="active">Outfits</a>
             <button class="logout" type="button" (click)="logout()">Salir</button>
           </nav>
         }

@@ -1,7 +1,7 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { ClothingCategory, CATEGORY_LABEL } from '../../models/clothing.model';
+import { Router, RouterLink } from '@angular/router';
+import { ClothingCategory, CATEGORY_LABEL, ClothingItem } from '../../models/clothing.model';
 import { ClothingService } from '../../services/clothing.service';
 
 @Component({
@@ -13,9 +13,15 @@ import { ClothingService } from '../../services/clothing.service';
     <div class="container page narrow">
       <section class="hero card">
         <div>
-          <p class="eyebrow">Nueva prenda</p>
-          <h1>Subir prenda al closet</h1>
-          <p class="muted">Agrega una foto y clasifica la prenda para usarla en el combinador.</p>
+          <p class="eyebrow">{{ editingItem() ? 'Editar prenda' : 'Nueva prenda' }}</p>
+          <h1>{{ editingItem() ? 'Editar prenda del closet' : 'Subir prenda al closet' }}</h1>
+          <p class="muted">
+            {{
+              editingItem()
+                ? 'Actualiza los datos o cambia la foto de esta prenda.'
+                : 'Agrega una foto y clasifica la prenda para usarla en el combinador.'
+            }}
+          </p>
         </div>
       </section>
 
@@ -39,6 +45,16 @@ import { ClothingService } from '../../services/clothing.service';
               <option value="bottom">{{ labels.bottom }}</option>
               <option value="shoes">{{ labels.shoes }}</option>
             </select>
+          </label>
+
+          <label>
+            Marca
+            <input
+              type="text"
+              name="brand"
+              [(ngModel)]="brand"
+              placeholder="Ejemplo: Nike, Zara, H&M"
+            />
           </label>
 
           <label>
@@ -78,14 +94,22 @@ import { ClothingService } from '../../services/clothing.service';
               name="file"
               (change)="onFileSelected($event)"
               [disabled]="processingImage()"
-              required
+              [required]="!editingItem()"
             />
             <label class="photo-picker" for="clothing-photo">
               <span class="photo-icon" aria-hidden="true"><span class="material-symbols-outlined">
                 upload
               </span></span>
               <span class="photo-copy">
-                <strong>{{ processingImage() ? 'Quitando fondo...' : selectedFile ? 'Cambiar foto' : 'Seleccionar foto' }}</strong>
+                <strong>{{
+                  processingImage()
+                    ? 'Quitando fondo...'
+                    : selectedFile
+                      ? 'Cambiar foto'
+                      : editingItem()
+                        ? 'Cambiar foto'
+                        : 'Seleccionar foto'
+                }}</strong>
                 <small>{{ processingMessage() || selectedFile?.name || 'PNG, JPG o WEBP' }}</small>
               </span>
               <span class="photo-action">Explorar</span>
@@ -93,10 +117,18 @@ import { ClothingService } from '../../services/clothing.service';
           </div>
 
           <button class="btn btn-primary" type="submit" [disabled]="loading() || processingImage()">
-            {{ processingImage() ? 'Procesando imagen...' : loading() ? 'Subiendo...' : 'Guardar prenda' }}
+            {{
+              processingImage()
+                ? 'Procesando imagen...'
+                : loading()
+                  ? (editingItem() ? 'Actualizando...' : 'Subiendo...')
+                  : (editingItem() ? 'Actualizar prenda' : 'Guardar prenda')
+            }}
           </button>
 
-          <a class="btn btn-secondary" routerLink="/wardrobe">Volver al combinador</a>
+          <a class="btn btn-secondary" [routerLink]="editingItem() ? '/catalog' : '/wardrobe'">
+            {{ editingItem() ? 'Volver al catálogo' : 'Volver al combinador' }}
+          </a>
 
           @if (success()) {
             <p class="success-text">{{ success() }}</p>
@@ -121,6 +153,9 @@ import { ClothingService } from '../../services/clothing.service';
 
           <div class="tags center">
             <span>{{ labels[category] }}</span>
+            @if (brand) {
+              <span>{{ brand }}</span>
+            }
             @if (color) {
               <span>{{ color }}</span>
             }
@@ -133,13 +168,19 @@ import { ClothingService } from '../../services/clothing.service';
     </div>
   `,
 })
-export class UploadClothingPageComponent implements OnDestroy {
+export class UploadClothingPageComponent implements OnInit, OnDestroy {
   readonly clothingService = inject(ClothingService);
+  private readonly router = inject(Router);
   readonly labels = CATEGORY_LABEL;
+
+  @Input() id?: string;
+
+  readonly editingItem = signal<ClothingItem | null>(null);
 
   name = '';
   category: ClothingCategory = 'top';
   color = '';
+  brand = '';
   readonly styleOptions = ['Casual', 'Formal', 'Elegante'];
   readonly selectedStyles = new Set<string>();
 
@@ -153,6 +194,36 @@ export class UploadClothingPageComponent implements OnDestroy {
 
   private imageSelectionId = 0;
 
+  async ngOnInit(): Promise<void> {
+    if (!this.id) return;
+
+    if (!this.clothingService.clothingItems().length) {
+      await this.clothingService.loadClothingItems();
+    }
+
+    const item = this.clothingService.getById(this.id);
+
+    if (!item) {
+      this.error.set('No se encontró la prenda a editar.');
+      return;
+    }
+
+    this.editingItem.set(item);
+    this.name = item.name;
+    this.category = item.category;
+    this.brand = item.brand ?? '';
+    this.color = item.color ?? '';
+
+    this.selectedStyles.clear();
+    (item.style ?? '')
+      .split(',')
+      .map((style) => style.trim())
+      .filter(Boolean)
+      .forEach((style) => this.selectedStyles.add(style));
+
+    this.previewUrl.set(item.image_url);
+  }
+
   async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
@@ -162,7 +233,7 @@ export class UploadClothingPageComponent implements OnDestroy {
     this.success.set(null);
 
     if (!file) {
-      this.replacePreview(null);
+      this.replacePreview(this.editingItem()?.image_url ?? null);
       this.selectedFile = null;
       return;
     }
@@ -197,7 +268,7 @@ export class UploadClothingPageComponent implements OnDestroy {
     } catch (error) {
       if (selectionId !== this.imageSelectionId) return;
       this.selectedFile = null;
-      this.replacePreview(null);
+      this.replacePreview(this.editingItem()?.image_url ?? null);
       input.value = '';
       this.error.set(
         error instanceof Error
@@ -224,7 +295,9 @@ export class UploadClothingPageComponent implements OnDestroy {
     this.error.set(null);
     this.success.set(null);
 
-    if (!this.selectedFile) {
+    const editing = this.editingItem();
+
+    if (!editing && !this.selectedFile) {
       this.error.set('Selecciona una imagen para la prenda.');
       return;
     }
@@ -237,21 +310,44 @@ export class UploadClothingPageComponent implements OnDestroy {
     this.loading.set(true);
 
     try {
-      const { imagePath, imageUrl } = await this.clothingService.uploadClothingImage(this.selectedFile);
+      if (editing) {
+        await this.clothingService.updateClothingItem(editing.id, {
+          name: this.name.trim(),
+          category: this.category,
+          brand: this.brand.trim() || undefined,
+          color: this.color.trim() || undefined,
+          style: Array.from(this.selectedStyles).join(', ') || undefined,
+        });
 
-      await this.clothingService.createClothingItem({
-        name: this.name.trim(),
-        category: this.category,
-        image_path: imagePath,
-        image_url: imageUrl,
-        color: this.color.trim() || undefined,
-        style: Array.from(this.selectedStyles).join(', ') || undefined,
-      });
+        if (this.selectedFile) {
+          await this.clothingService.replaceClothingImage(editing, this.selectedFile);
+        }
 
-      this.success.set('Prenda guardada correctamente ♡');
-      this.resetForm();
+        await this.router.navigateByUrl('/catalog');
+      } else {
+        const { imagePath, imageUrl } = await this.clothingService.uploadClothingImage(this.selectedFile!);
+
+        await this.clothingService.createClothingItem({
+          name: this.name.trim(),
+          category: this.category,
+          image_path: imagePath,
+          image_url: imageUrl,
+          brand: this.brand.trim() || undefined,
+          color: this.color.trim() || undefined,
+          style: Array.from(this.selectedStyles).join(', ') || undefined,
+        });
+
+        this.success.set('Prenda guardada correctamente ♡');
+        this.resetForm();
+      }
     } catch (error) {
-      this.error.set(error instanceof Error ? error.message : 'No se pudo guardar la prenda.');
+      this.error.set(
+        error instanceof Error
+          ? error.message
+          : editing
+            ? 'No se pudo actualizar la prenda.'
+            : 'No se pudo guardar la prenda.',
+      );
     } finally {
       this.loading.set(false);
     }
@@ -260,6 +356,7 @@ export class UploadClothingPageComponent implements OnDestroy {
   private resetForm(): void {
     this.name = '';
     this.category = 'top';
+    this.brand = '';
     this.color = '';
     this.selectedStyles.clear();
     this.selectedFile = null;
@@ -274,7 +371,7 @@ export class UploadClothingPageComponent implements OnDestroy {
 
   private replacePreview(url: string | null): void {
     const currentUrl = this.previewUrl();
-    if (currentUrl) URL.revokeObjectURL(currentUrl);
+    if (currentUrl?.startsWith('blob:')) URL.revokeObjectURL(currentUrl);
     this.previewUrl.set(url);
   }
 }

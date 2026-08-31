@@ -31,6 +31,9 @@ import { ClothingItem } from '../../models/clothing.model';
               <h3>{{ item.name }}</h3>
 
               <div class="tags">
+                @if (item.brand) {
+                  <span>{{ item.brand }}</span>
+                }
                 @if (item.color) {
                   <span>{{ item.color }}</span>
                 }
@@ -55,10 +58,13 @@ export class ClothingCarouselComponent implements OnChanges {
   @Input({ required: true }) title = '';
   @Input() emptyMessage = 'Todavía no hay prendas en esta categoría.';
   @Input() items: ClothingItem[] = [];
+  @Input() selectedId?: string | null;
 
   @Output() selectedChange = new EventEmitter<ClothingItem | null>();
 
   selectedIndex = signal(0);
+
+  private appliedInitialSelection = false;
 
   get selectedItem(): ClothingItem | null {
     return this.items[this.selectedIndex()] ?? null;
@@ -69,6 +75,14 @@ export class ClothingCarouselComponent implements OnChanges {
       this.selectedIndex.set(0);
       this.selectedChange.emit(null);
       return;
+    }
+
+    if (!this.appliedInitialSelection && this.selectedId) {
+      const index = this.items.findIndex((item) => item.id === this.selectedId);
+      if (index !== -1) {
+        this.selectedIndex.set(index);
+        this.appliedInitialSelection = true;
+      }
     }
 
     if (this.selectedIndex() > this.items.length - 1) {

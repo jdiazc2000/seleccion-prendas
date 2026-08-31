@@ -7,6 +7,7 @@ export interface ClothingItem {
   category: ClothingCategory;
   image_path: string;
   image_url: string;
+  brand?: string | null;
   color?: string | null;
   style?: string | null;
   created_at: string;
@@ -17,6 +18,7 @@ export interface CreateClothingItem {
   category: ClothingCategory;
   image_path: string;
   image_url: string;
+  brand?: string;
   color?: string;
   style?: string;
 }

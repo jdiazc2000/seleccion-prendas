@@ -37,11 +37,25 @@ export const routes: Routes = [
         .then((m) => m.UploadClothingPageComponent),
   },
   {
-    path: 'favorites',
+    path: 'upload/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./core/features/wardrobe/pages/upload-clothing-page/upload-clothing-page.component')
+        .then((m) => m.UploadClothingPageComponent),
+  },
+  {
+    path: 'catalog',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./core/features/wardrobe/pages/catalog-page/catalog-page.component')
+        .then((m) => m.CatalogPageComponent),
+  },
+  {
+    path: 'outfits',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./core/features/wardrobe/pages/favorites-page/favorites-page.component')
-        .then((m) => m.FavoritesPageComponent),
+        .then((m) => m.OutfitsPageComponent),
   },
   {
     path: '**',

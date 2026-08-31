@@ -93,6 +93,38 @@ export class ClothingService {
     await this.loadClothingItems();
   }
 
+  async updateClothingItem(
+    id: string,
+    changes: Partial<Pick<CreateClothingItem, 'name' | 'category' | 'brand' | 'color' | 'style'>>,
+  ): Promise<void> {
+    const { error } = await supabase.from('clothing_items').update(changes).eq('id', id);
+
+    if (error) {
+      this.error.set(error.message);
+      throw new Error(error.message);
+    }
+
+    await this.loadClothingItems();
+  }
+
+  async replaceClothingImage(item: ClothingItem, file: File): Promise<void> {
+    const { imagePath, imageUrl } = await this.uploadClothingImage(file);
+
+    const { error } = await supabase
+      .from('clothing_items')
+      .update({ image_path: imagePath, image_url: imageUrl })
+      .eq('id', item.id);
+
+    if (error) {
+      this.error.set(error.message);
+      throw new Error(error.message);
+    }
+
+    await supabase.storage.from(this.bucketName).remove([item.image_path]);
+
+    await this.loadClothingItems();
+  }
+
   async deleteClothingItem(item: ClothingItem): Promise<void> {
     const { error: deleteDbError } = await supabase
       .from('clothing_items')

@@ -12,7 +12,7 @@
   gap: 12px;
 }
 
-.favorites-grid {
+.outfits-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
@@ -30,16 +30,64 @@
   margin-bottom: 18px;
 }
 
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-btn,
 .delete-btn {
   border-radius: 999px;
   padding: 9px 12px;
+  font-weight: 900;
+}
+
+.edit-btn {
+  color: #9c2f53;
+  background: white;
+  border: 1px solid #f0ccd8;
+}
+
+.edit-btn:hover {
+  border-color: #d64f75;
+}
+
+.delete-btn {
   color: #9c2f53;
   background: #ffe4ec;
-  font-weight: 900;
 }
 
 .delete-btn:hover {
   background: #ffd2df;
+}
+
+.edit-form {
+  display: grid;
+  gap: 12px;
+}
+
+.edit-carousels {
+  display: grid;
+  gap: 12px;
+}
+
+.edit-carousels app-clothing-carousel {
+  border: 1px solid rgba(214, 79, 117, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.edit-form label {
+  display: grid;
+  gap: 6px;
+  color: #5c3c4b;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .favorite-images {
@@ -68,7 +116,7 @@
 }
 
 @media (max-width: 900px) {
-  .favorites-grid {
+  .outfits-grid {
     grid-template-columns: 1fr;
   }
 }

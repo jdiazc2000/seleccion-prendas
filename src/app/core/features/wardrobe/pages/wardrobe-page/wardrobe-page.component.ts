@@ -81,7 +81,7 @@ import { ClothingItem } from '../../models/clothing.model';
               {{ outfitService.loading() ? 'Guardando...' : 'Guardar outfit' }}
             </button>
 
-            <a class="btn btn-secondary full" routerLink="/favorites">Ver favoritos</a>
+            <a class="btn btn-secondary full" routerLink="/outfits">Ver Outfits</a>
 
             @if (message()) {
               <p class="success-text">{{ message() }}</p>
@@ -142,6 +142,6 @@ export class WardrobePageComponent implements OnInit {
     });
 
     this.outfitName = '';
-    this.message.set('Outfit guardado en favoritos ♡');
+    this.message.set('Outfit guardado en Outfits ♡');
   }
 }

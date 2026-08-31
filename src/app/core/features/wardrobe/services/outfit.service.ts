@@ -50,6 +50,17 @@ export class OutfitService {
     await this.loadOutfits();
   }
 
+  async updateOutfit(id: string, changes: Partial<CreateOutfit>): Promise<void> {
+    const { error } = await supabase.from('outfits').update(changes).eq('id', id);
+
+    if (error) {
+      this.error.set(error.message);
+      throw new Error(error.message);
+    }
+
+    await this.loadOutfits();
+  }
+
   async deleteOutfit(id: string): Promise<void> {
     const { error } = await supabase.from('outfits').delete().eq('id', id);
 
