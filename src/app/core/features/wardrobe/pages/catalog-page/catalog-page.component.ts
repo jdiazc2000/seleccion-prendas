@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { DragScrollDirective } from '../../directives/drag-scroll.directive';
 import { ToastService } from '../../../../shared/toast.service';
 import { CATEGORY_LABEL, ClothingCategory, ClothingItem } from '../../models/clothing.model';
 import { ClothingService } from '../../services/clothing.service';
@@ -12,7 +11,7 @@ type CategoryFilter = ClothingCategory | 'all';
   selector: 'app-catalog-page',
   standalone: true,
   styleUrl: './catalog-page.component.scss',
-  imports: [FormsModule, RouterLink, DragScrollDirective],
+  imports: [FormsModule, RouterLink],
   template: `
     <div class="container page">
       <section class="hero card">
@@ -86,7 +85,7 @@ type CategoryFilter = ClothingCategory | 'all';
         </section>
       }
 
-      <section class="catalog-grid" appDragScroll>
+      <section class="catalog-grid">
         @for (item of filteredItems(); track item.id) {
           <article class="catalog-card card">
             <div class="card-actions">
