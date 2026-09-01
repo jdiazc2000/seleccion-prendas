@@ -1,9 +1,11 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ClothingCarouselComponent } from '../../components/clothing-carousel/clothing-carousel.component';
 import { DragScrollDirective } from '../../directives/drag-scroll.directive';
 import { ToastService } from '../../../../shared/toast.service';
+import { ViewportService } from '../../../../shared/viewport.service';
 import { ClothingItem } from '../../models/clothing.model';
 import { Outfit } from '../../models/outfit.model';
 import { ClothingService } from '../../services/clothing.service';
@@ -20,7 +22,7 @@ interface OutfitView {
   selector: 'app-favorites-page',
   styleUrl: './favorites-page.component.scss',
   standalone: true,
-  imports: [FormsModule, RouterLink, ClothingCarouselComponent, DragScrollDirective],
+  imports: [FormsModule, RouterLink, ClothingCarouselComponent, DragScrollDirective, MatPaginatorModule],
   template: `
     <div class="container page">
       <section class="hero card">
@@ -46,7 +48,7 @@ interface OutfitView {
       }
 
       <section class="outfits-grid" appDragScroll>
-        @for (view of outfits(); track view.outfit.id) {
+        @for (view of visibleOutfits(); track view.outfit.id) {
           <article class="favorite-card card">
             @if (editingOutfitId() === view.outfit.id) {
               <div class="edit-form">
@@ -132,6 +134,17 @@ interface OutfitView {
           </article>
         }
       </section>
+
+      @if (isGridMode() && outfits().length) {
+        <mat-paginator
+          [length]="outfits().length"
+          [pageSize]="pageSize()"
+          [pageIndex]="clampedPageIndex()"
+          [pageSizeOptions]="[4, 6, 8]"
+          (page)="onPageChange($event)"
+          aria-label="Selecciona página de outfits"
+        />
+      }
     </div>
   `,
 })
@@ -139,6 +152,8 @@ export class OutfitsPageComponent implements OnInit {
   readonly clothingService = inject(ClothingService);
   readonly outfitService = inject(OutfitService);
   private readonly toast = inject(ToastService);
+  private readonly viewport = inject(ViewportService);
+  readonly isGridMode = this.viewport.isGridMode;
 
   readonly outfits = computed<OutfitView[]>(() =>
     this.outfitService.outfits().map((outfit) => ({
@@ -158,6 +173,26 @@ export class OutfitsPageComponent implements OnInit {
   editTopId = '';
   editBottomId = '';
   editShoesId = '';
+
+  readonly pageSize = signal(6);
+  readonly pageIndex = signal(0);
+
+  private readonly maxPageIndex = computed(() =>
+    Math.max(0, Math.ceil(this.outfits().length / this.pageSize()) - 1),
+  );
+  readonly clampedPageIndex = computed(() => Math.min(this.pageIndex(), this.maxPageIndex()));
+
+  private readonly pagedOutfits = computed(() => {
+    const start = this.clampedPageIndex() * this.pageSize();
+    return this.outfits().slice(start, start + this.pageSize());
+  });
+
+  readonly visibleOutfits = computed(() => (this.isGridMode() ? this.pagedOutfits() : this.outfits()));
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+  }
 
   async ngOnInit(): Promise<void> {
     await Promise.all([

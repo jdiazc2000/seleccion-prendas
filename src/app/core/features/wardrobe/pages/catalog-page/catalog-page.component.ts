@@ -1,7 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ToastService } from '../../../../shared/toast.service';
+import { ViewportService } from '../../../../shared/viewport.service';
 import { CATEGORY_LABEL, ClothingCategory, ClothingItem } from '../../models/clothing.model';
 import { ClothingService } from '../../services/clothing.service';
 
@@ -11,7 +13,7 @@ type CategoryFilter = ClothingCategory | 'all';
   selector: 'app-catalog-page',
   standalone: true,
   styleUrl: './catalog-page.component.scss',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, MatPaginatorModule],
   template: `
     <div class="container page">
       <section class="hero card">
@@ -30,7 +32,7 @@ type CategoryFilter = ClothingCategory | 'all';
               type="button"
               [class.selected]="categoryFilter() === option.value"
               [attr.aria-pressed]="categoryFilter() === option.value"
-              (click)="categoryFilter.set(option.value)"
+              (click)="setCategoryFilter(option.value)"
             >
               {{ option.label }}
             </button>
@@ -40,7 +42,7 @@ type CategoryFilter = ClothingCategory | 'all';
         <div class="select-filters">
           <label>
             Marca
-            <select [ngModel]="brandFilter()" (ngModelChange)="brandFilter.set($event)">
+            <select [ngModel]="brandFilter()" (ngModelChange)="setBrandFilter($event)">
               <option value="all">Todas</option>
               @for (brand of brands(); track brand) {
                 <option [value]="brand">{{ brand }}</option>
@@ -50,7 +52,7 @@ type CategoryFilter = ClothingCategory | 'all';
 
           <label>
             Color
-            <select [ngModel]="colorFilter()" (ngModelChange)="colorFilter.set($event)">
+            <select [ngModel]="colorFilter()" (ngModelChange)="setColorFilter($event)">
               <option value="all">Todos</option>
               @for (color of colors(); track color) {
                 <option [value]="color">{{ color }}</option>
@@ -60,7 +62,7 @@ type CategoryFilter = ClothingCategory | 'all';
 
           <label>
             Estilo
-            <select [ngModel]="styleFilter()" (ngModelChange)="styleFilter.set($event)">
+            <select [ngModel]="styleFilter()" (ngModelChange)="setStyleFilter($event)">
               <option value="all">Todos</option>
               @for (style of styles(); track style) {
                 <option [value]="style">{{ style }}</option>
@@ -86,7 +88,7 @@ type CategoryFilter = ClothingCategory | 'all';
       }
 
       <section class="catalog-grid">
-        @for (item of filteredItems(); track item.id) {
+        @for (item of visibleItems(); track item.id) {
           <article class="catalog-card card">
             <div class="card-actions">
               <a class="edit-btn" [routerLink]="['/upload', item.id]">Editar</a>
@@ -116,12 +118,25 @@ type CategoryFilter = ClothingCategory | 'all';
           </article>
         }
       </section>
+
+      @if (isGridMode() && filteredItems().length) {
+        <mat-paginator
+          [length]="filteredItems().length"
+          [pageSize]="pageSize()"
+          [pageIndex]="clampedPageIndex()"
+          [pageSizeOptions]="[8, 12, 24]"
+          (page)="onPageChange($event)"
+          aria-label="Selecciona página del catálogo"
+        />
+      }
     </div>
   `,
 })
 export class CatalogPageComponent implements OnInit {
   readonly clothingService = inject(ClothingService);
   private readonly toast = inject(ToastService);
+  private readonly viewport = inject(ViewportService);
+  readonly isGridMode = this.viewport.isGridMode;
   readonly labels = CATEGORY_LABEL;
 
   readonly categoryOptions: { value: CategoryFilter; label: string }[] = [
@@ -165,6 +180,46 @@ export class CatalogPageComponent implements OnInit {
       return true;
     });
   });
+
+  readonly pageSize = signal(12);
+  readonly pageIndex = signal(0);
+
+  private readonly maxPageIndex = computed(() =>
+    Math.max(0, Math.ceil(this.filteredItems().length / this.pageSize()) - 1),
+  );
+  readonly clampedPageIndex = computed(() => Math.min(this.pageIndex(), this.maxPageIndex()));
+
+  private readonly pagedItems = computed(() => {
+    const start = this.clampedPageIndex() * this.pageSize();
+    return this.filteredItems().slice(start, start + this.pageSize());
+  });
+
+  readonly visibleItems = computed(() => (this.isGridMode() ? this.pagedItems() : this.filteredItems()));
+
+  setCategoryFilter(value: CategoryFilter): void {
+    this.categoryFilter.set(value);
+    this.pageIndex.set(0);
+  }
+
+  setBrandFilter(value: string): void {
+    this.brandFilter.set(value);
+    this.pageIndex.set(0);
+  }
+
+  setColorFilter(value: string): void {
+    this.colorFilter.set(value);
+    this.pageIndex.set(0);
+  }
+
+  setStyleFilter(value: string): void {
+    this.styleFilter.set(value);
+    this.pageIndex.set(0);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+  }
 
   async ngOnInit(): Promise<void> {
     await this.clothingService.loadClothingItems();

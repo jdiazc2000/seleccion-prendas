@@ -1,8 +1,10 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
+import { provideSpanishPaginatorIntl } from './core/shared/spanish-paginator-intl';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,5 +17,6 @@ export const appConfig: ApplicationConfig = {
       preventDuplicates: true,
       closeButton: true,
     }),
+    { provide: MatPaginatorIntl, useFactory: provideSpanishPaginatorIntl },
   ],
 };

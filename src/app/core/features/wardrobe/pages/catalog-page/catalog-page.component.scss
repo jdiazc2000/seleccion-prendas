@@ -137,6 +137,13 @@
   margin-bottom: 0;
 }
 
+mat-paginator {
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(214, 79, 117, 0.14);
+}
+
 @media (max-width: 900px) {
   .select-filters {
     grid-template-columns: 1fr;
