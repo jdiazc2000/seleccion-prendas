@@ -153,11 +153,24 @@ export class CatalogPageComponent implements OnInit {
 
   private readonly items = this.clothingService.clothingItems;
 
-  readonly brands = computed(() => this.uniqueValues(this.items().map((item) => item.brand)));
-  readonly colors = computed(() => this.uniqueValues(this.items().map((item) => item.color)));
+  private readonly itemsInCategory = computed(() => {
+    const category = this.categoryFilter();
+    return category === 'all'
+      ? this.items()
+      : this.items().filter((item) => item.category === category);
+  });
+
+  readonly brands = computed(() =>
+    this.uniqueValues(this.itemsInCategory().map((item) => item.brand)),
+  );
+  readonly colors = computed(() =>
+    this.uniqueValues(this.itemsInCategory().map((item) => item.color)),
+  );
   readonly styles = computed(() =>
     this.uniqueValues(
-      this.items().flatMap((item) => (item.style ?? '').split(',').map((style) => style.trim())),
+      this.itemsInCategory().flatMap((item) =>
+        (item.style ?? '').split(',').map((style) => style.trim()),
+      ),
     ),
   );
 
@@ -198,6 +211,9 @@ export class CatalogPageComponent implements OnInit {
 
   setCategoryFilter(value: CategoryFilter): void {
     this.categoryFilter.set(value);
+    this.brandFilter.set('all');
+    this.colorFilter.set('all');
+    this.styleFilter.set('all');
     this.pageIndex.set(0);
   }
 
