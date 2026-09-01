@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ToastService } from '../../../../shared/toast.service';
 import { ClothingCategory, CATEGORY_LABEL, ClothingItem } from '../../models/clothing.model';
 import { ClothingService } from '../../services/clothing.service';
 
@@ -171,6 +172,7 @@ import { ClothingService } from '../../services/clothing.service';
 export class UploadClothingPageComponent implements OnInit, OnDestroy {
   readonly clothingService = inject(ClothingService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
   readonly labels = CATEGORY_LABEL;
 
   @Input() id?: string;
@@ -323,6 +325,7 @@ export class UploadClothingPageComponent implements OnInit, OnDestroy {
           await this.clothingService.replaceClothingImage(editing, this.selectedFile);
         }
 
+        this.toast.success('Prenda actualizada correctamente ♡');
         await this.router.navigateByUrl('/catalog');
       } else {
         const { imagePath, imageUrl } = await this.clothingService.uploadClothingImage(this.selectedFile!);
@@ -338,16 +341,19 @@ export class UploadClothingPageComponent implements OnInit, OnDestroy {
         });
 
         this.success.set('Prenda guardada correctamente ♡');
+        this.toast.success('Prenda guardada correctamente ♡');
         this.resetForm();
       }
     } catch (error) {
-      this.error.set(
+      const message =
         error instanceof Error
           ? error.message
           : editing
             ? 'No se pudo actualizar la prenda.'
-            : 'No se pudo guardar la prenda.',
-      );
+            : 'No se pudo guardar la prenda.';
+
+      this.error.set(message);
+      this.toast.error(message);
     } finally {
       this.loading.set(false);
     }

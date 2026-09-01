@@ -47,7 +47,16 @@
   background: #ffd2df;
 }
 
+.arrow-prev {
+  grid-column: 1;
+}
+
+.arrow-next {
+  grid-column: 3;
+}
+
 .clothing-item {
+  grid-column: 2;
   min-width: 0;
   text-align: center;
 }

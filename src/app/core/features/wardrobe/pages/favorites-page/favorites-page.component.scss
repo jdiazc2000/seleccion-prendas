@@ -24,7 +24,7 @@
 
 .favorite-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 18px;
@@ -33,6 +33,8 @@
 .card-actions {
   display: flex;
   gap: 8px;
+  justify-content: center;
+  align-items: center;
 }
 
 .edit-btn,
@@ -88,6 +90,8 @@
 .edit-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+  justify-content: center;
 }
 
 .favorite-images {
@@ -113,11 +117,41 @@
   width: 100%;
   height: 110px;
   object-fit: contain;
+  -webkit-user-drag: none;
 }
 
 @media (max-width: 900px) {
   .outfits-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 899px) {
+  .outfits-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .outfits-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .outfits-grid.dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+  }
+
+  .favorite-card {
+    flex: 0 0 82%;
+    scroll-snap-align: center;
   }
 }
 

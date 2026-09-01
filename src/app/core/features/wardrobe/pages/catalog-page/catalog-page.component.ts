@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { DragScrollDirective } from '../../directives/drag-scroll.directive';
+import { ToastService } from '../../../../shared/toast.service';
 import { CATEGORY_LABEL, ClothingCategory, ClothingItem } from '../../models/clothing.model';
 import { ClothingService } from '../../services/clothing.service';
 
@@ -10,7 +12,7 @@ type CategoryFilter = ClothingCategory | 'all';
   selector: 'app-catalog-page',
   standalone: true,
   styleUrl: './catalog-page.component.scss',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, DragScrollDirective],
   template: `
     <div class="container page">
       <section class="hero card">
@@ -84,7 +86,7 @@ type CategoryFilter = ClothingCategory | 'all';
         </section>
       }
 
-      <section class="catalog-grid">
+      <section class="catalog-grid" appDragScroll>
         @for (item of filteredItems(); track item.id) {
           <article class="catalog-card card">
             <div class="card-actions">
@@ -120,6 +122,7 @@ type CategoryFilter = ClothingCategory | 'all';
 })
 export class CatalogPageComponent implements OnInit {
   readonly clothingService = inject(ClothingService);
+  private readonly toast = inject(ToastService);
   readonly labels = CATEGORY_LABEL;
 
   readonly categoryOptions: { value: CategoryFilter; label: string }[] = [
@@ -169,7 +172,12 @@ export class CatalogPageComponent implements OnInit {
   }
 
   async deleteItem(item: ClothingItem): Promise<void> {
-    await this.clothingService.deleteClothingItem(item);
+    try {
+      await this.clothingService.deleteClothingItem(item);
+      this.toast.success('Prenda eliminada correctamente');
+    } catch (error) {
+      this.toast.error(error instanceof Error ? error.message : 'No se pudo eliminar la prenda.');
+    }
   }
 
   private uniqueValues(values: (string | null | undefined)[]): string[] {

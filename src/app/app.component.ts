@@ -10,10 +10,24 @@ import { AuthService } from './core/auth/auth.service';
   template: `
     <header class="app-header">
       <div class="container header-content">
-        <a class="brand" routerLink="/wardrobe">
-          <span class="brand-icon">♡</span>
-          <span>Closet App</span>
-        </a>
+        <div class="brand-row">
+          <a class="brand" routerLink="/wardrobe">
+            <span class="brand-icon">♡</span>
+            <span>Closet App</span>
+          </a>
+
+          @if (authService.user()) {
+            <button
+              class="logout logout-mobile"
+              type="button"
+              title="Salir"
+              aria-label="Salir"
+              (click)="logout()"
+            >
+              <span class="material-symbols-outlined">meeting_room</span>
+            </button>
+          }
+        </div>
 
         @if (authService.user()) {
           <nav class="nav">
@@ -21,7 +35,15 @@ import { AuthService } from './core/auth/auth.service';
             <a routerLink="/catalog" routerLinkActive="active">Catálogo</a>
             <a routerLink="/wardrobe" routerLinkActive="active">Combinar</a>
             <a routerLink="/outfits" routerLinkActive="active">Outfits</a>
-            <button class="logout" type="button" (click)="logout()">Salir</button>
+            <button
+              class="logout logout-desktop"
+              type="button"
+              title="Salir"
+              aria-label="Salir"
+              (click)="logout()"
+            >
+              <span class="material-symbols-outlined">meeting_room</span>
+            </button>
           </nav>
         }
       </div>

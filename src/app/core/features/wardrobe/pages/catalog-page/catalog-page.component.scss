@@ -71,7 +71,7 @@
 
 .card-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 8px;
   margin-bottom: 12px;
 }
@@ -124,6 +124,7 @@
   height: 100%;
   object-fit: scale-down;
   object-position: center;
+  -webkit-user-drag: none;
 }
 
 .item-info {
@@ -140,6 +141,35 @@
 @media (max-width: 900px) {
   .select-filters {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 899px) {
+  .catalog-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .catalog-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalog-grid.dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+  }
+
+  .catalog-card {
+    flex: 0 0 78%;
+    scroll-snap-align: center;
   }
 }
 

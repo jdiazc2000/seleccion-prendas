@@ -21,7 +21,7 @@ export class OutfitService {
       .from('outfits')
       .select('*')
       .eq('is_favorite', true)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
 
     this.loading.set(false);
 

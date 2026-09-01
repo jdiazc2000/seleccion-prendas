@@ -2,6 +2,8 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ClothingCarouselComponent } from '../../components/clothing-carousel/clothing-carousel.component';
+import { DragScrollDirective } from '../../directives/drag-scroll.directive';
+import { ToastService } from '../../../../shared/toast.service';
 import { ClothingItem } from '../../models/clothing.model';
 import { Outfit } from '../../models/outfit.model';
 import { ClothingService } from '../../services/clothing.service';
@@ -18,7 +20,7 @@ interface OutfitView {
   selector: 'app-favorites-page',
   styleUrl: './favorites-page.component.scss',
   standalone: true,
-  imports: [FormsModule, RouterLink, ClothingCarouselComponent],
+  imports: [FormsModule, RouterLink, ClothingCarouselComponent, DragScrollDirective],
   template: `
     <div class="container page">
       <section class="hero card">
@@ -43,7 +45,7 @@ interface OutfitView {
         </section>
       }
 
-      <section class="outfits-grid">
+      <section class="outfits-grid" appDragScroll>
         @for (view of outfits(); track view.outfit.id) {
           <article class="favorite-card card">
             @if (editingOutfitId() === view.outfit.id) {
@@ -136,6 +138,7 @@ interface OutfitView {
 export class OutfitsPageComponent implements OnInit {
   readonly clothingService = inject(ClothingService);
   readonly outfitService = inject(OutfitService);
+  private readonly toast = inject(ToastService);
 
   readonly outfits = computed<OutfitView[]>(() =>
     this.outfitService.outfits().map((outfit) => ({
@@ -176,16 +179,26 @@ export class OutfitsPageComponent implements OnInit {
   }
 
   async saveEdit(id: string): Promise<void> {
-    await this.outfitService.updateOutfit(id, {
-      name: this.editName.trim() || undefined,
-      top_id: this.editTopId,
-      bottom_id: this.editBottomId,
-      shoes_id: this.editShoesId,
-    });
-    this.editingOutfitId.set(null);
+    try {
+      await this.outfitService.updateOutfit(id, {
+        name: this.editName.trim() || undefined,
+        top_id: this.editTopId,
+        bottom_id: this.editBottomId,
+        shoes_id: this.editShoesId,
+      });
+      this.editingOutfitId.set(null);
+      this.toast.success('Outfit actualizado correctamente');
+    } catch (error) {
+      this.toast.error(error instanceof Error ? error.message : 'No se pudo actualizar el outfit.');
+    }
   }
 
   async deleteOutfit(id: string): Promise<void> {
-    await this.outfitService.deleteOutfit(id);
+    try {
+      await this.outfitService.deleteOutfit(id);
+      this.toast.success('Outfit eliminado correctamente');
+    } catch (error) {
+      this.toast.error(error instanceof Error ? error.message : 'No se pudo eliminar el outfit.');
+    }
   }
 }

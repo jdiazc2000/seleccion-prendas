@@ -20,7 +20,9 @@ import { ClothingItem } from '../../models/clothing.model';
 
       @if (selectedItem; as item) {
         <div class="carousel-body">
-          <button class="arrow" type="button" aria-label="Anterior" (click)="previous()">‹</button>
+          @if (selectedIndex() > 0) {
+            <button class="arrow arrow-prev" type="button" aria-label="Anterior" (click)="previous()">‹</button>
+          }
 
           <article class="clothing-item">
             <div class="image-shell">
@@ -43,8 +45,9 @@ import { ClothingItem } from '../../models/clothing.model';
               </div>
             </div>
           </article>
-
-          <button class="arrow" type="button" aria-label="Siguiente" (click)="next()">›</button>
+          @if (selectedIndex() < items.length - 1) {
+            <button class="arrow arrow-next" type="button" aria-label="Siguiente" (click)="next()">›</button>
+          }
         </div>
       } @else {
         <div class="empty-state">

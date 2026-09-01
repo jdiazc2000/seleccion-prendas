@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ClothingCarouselComponent } from '../../components/clothing-carousel/clothing-carousel.component';
 import { OutfitPreviewComponent } from '../../components/outfit-preview/outfit-preview.component';
+import { ToastService } from '../../../../shared/toast.service';
 import { ClothingService } from '../../services/clothing.service';
 import { OutfitService } from '../../services/outfit.service';
 import { ClothingItem } from '../../models/clothing.model';
@@ -99,6 +100,7 @@ import { ClothingItem } from '../../models/clothing.model';
 export class WardrobePageComponent implements OnInit {
   readonly clothingService = inject(ClothingService);
   readonly outfitService = inject(OutfitService);
+  private readonly toast = inject(ToastService);
 
   readonly topSelected = signal<ClothingItem | null>(null);
   readonly bottomSelected = signal<ClothingItem | null>(null);
@@ -134,14 +136,19 @@ export class WardrobePageComponent implements OnInit {
 
     this.message.set(null);
 
-    await this.outfitService.createOutfit({
-      name: this.outfitName.trim() || undefined,
-      top_id: top.id,
-      bottom_id: bottom.id,
-      shoes_id: shoes.id,
-    });
+    try {
+      await this.outfitService.createOutfit({
+        name: this.outfitName.trim() || undefined,
+        top_id: top.id,
+        bottom_id: bottom.id,
+        shoes_id: shoes.id,
+      });
 
-    this.outfitName = '';
-    this.message.set('Outfit guardado en Outfits ♡');
+      this.outfitName = '';
+      this.message.set('Outfit guardado en Outfits ♡');
+      this.toast.success('Outfit guardado correctamente ♡');
+    } catch (error) {
+      this.toast.error(error instanceof Error ? error.message : 'No se pudo guardar el outfit.');
+    }
   }
 }
